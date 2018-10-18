@@ -8,6 +8,8 @@ import tensorflow as tf
 import numpy as np
 import datetime
 
+plt.ion()
+
 # Function to load and flatten the image data, one_hot_encode the label data
 
 
@@ -128,6 +130,17 @@ def model_2layer_dropout(n_units_1=512, n_units_2=256, batch_size=200, num_steps
                 print("Training set accuracy: {:.1f}%".format(train_acc * 100))
                 print("Validation set accuracy: {:.1f}%".format(val_acc * 100))
                 print()
+                plt.close()
+                x = [
+                    i * record_every for i in list(range(len(val_loss_evolution)))]
+                plt.plot(x, train_loss_evolution, '-',
+                         label='Training Loss', color='blue')
+                plt.plot(x, val_loss_evolution, '-',
+                         label='Validation Loss', color='darkorange')
+                plt.legend()
+                plt.xlabel('Iteration')
+                plt.ylabel('loss')
+                plt.pause(0.000001)
         print()
         # Get accuracy score on the test set in the end
         test_acc = accuracy.eval(
@@ -137,19 +150,19 @@ def model_2layer_dropout(n_units_1=512, n_units_2=256, batch_size=200, num_steps
         print("Final Test Set accuracy: {:.1f}%".format(test_acc * 100))
         # Plot the results
         # Make x axis reflect the actual iteration number:
-        x = [i * record_every for i in list(range(len(val_loss_evolution)))]
-        plt.plot(x, train_loss_evolution, '-',
-                 label='Training Loss', color='blue')
-        plt.plot(x, val_loss_evolution, '-',
-                 label='Validation Loss', color='darkorange')
-        plt.legend()
-        plt.xlabel('Iteration')
-        plt.ylabel('loss')
+        # x = [i * record_every for i in list(range(len(val_loss_evolution)))]
+        # plt.plot(x, train_loss_evolution, '-',
+        #          label='Training Loss', color='blue')
+        # plt.plot(x, val_loss_evolution, '-',
+        #          label='Validation Loss', color='darkorange')
+        # plt.legend()
+        # plt.xlabel('Iteration')
+        # plt.ylabel('loss')
+        # plt.show(block=True)
         training_time = datetime.datetime.strptime(
             str(datetime.datetime.now() - starttime), '%H:%M:%S.%f')
         print(training_time.strftime(
             'Training Took %H hours, %M minutes and %S seconds'))
-        plt.show()
 
 
 model_2layer_dropout()
