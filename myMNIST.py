@@ -40,7 +40,7 @@ def load_dataset():
 
 def model_2layer_dropout(n_units_1=512, n_units_2=256, batch_size=200, num_steps=3300):
     # Set some parameters for how often losses and accuracies are displayed:
-    # Measure losses 20 times throughout training (faster than measuring at each iteration)
+    # Measure losses 20 times throughout training
     record_every = (num_steps / 20) // 1
     # Measure and print accuracy 6 times throughout training:
     print_every = (num_steps / 6) // 1
