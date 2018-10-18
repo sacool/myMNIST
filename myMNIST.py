@@ -86,11 +86,10 @@ def model_2layer_dropout(n_units_1=512, n_units_2=256, batch_size=200, num_steps
     # Use softmax cross entropy loss function, built in to tf
     loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
         labels=input_y, logits=logits_3))
-    # Adam optimizer works, I achieved 98% test set accuracy with learning rate of 0.005
-    # 0.001 seems to do better on average
+    # Adam optimizer works, I achieved 98% 0.001
     optimizer = tf.train.AdamOptimizer(0.001).minimize(loss)
 
-    # In order to judge accuracy, this compares my predicted y to the actual label in input_y
+    # In order to judge accuracy, compare predicted and actual y
     correct_prediction = tf.equal(
         tf.argmax(predicted_y, 1), tf.argmax(input_y, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
@@ -102,7 +101,7 @@ def model_2layer_dropout(n_units_1=512, n_units_2=256, batch_size=200, num_steps
         starttime = datetime.datetime.now()
         sess.run(tf.global_variables_initializer())
         for step in range(num_steps):
-            # Minibatches are randomly selected: the index it starts at is chosen using np.random.randint
+            # Minibatches are randomly selected
             batch_start = np.random.randint(len(X_train) - batch_size)
             # make the mini batch
             batch_x = X_train[batch_start:(batch_start + batch_size), :]
@@ -118,7 +117,7 @@ def model_2layer_dropout(n_units_1=512, n_units_2=256, batch_size=200, num_steps
                 val_loss_i = sess.run(
                     loss, {input_X: X_val, input_y: y_val, keep_prob: 0.2})
                 val_loss_evolution.append(val_loss_i)
-            # print out how things are going every 500 iterations
+            # print out and plot how things are going every once in a while
             if step % print_every == 0:
                 print("Training loss at iter {}: {:.4f}".format(step, train_loss_i))
                 print("Validation loss at iter {}, {:.4f}".format(step, val_loss_i))
@@ -148,17 +147,6 @@ def model_2layer_dropout(n_units_1=512, n_units_2=256, batch_size=200, num_steps
         print("Final Training Loss: {:.4f}".format(train_loss_i))
         print("Final Validation Loss: {:.4f}".format(val_loss_i))
         print("Final Test Set accuracy: {:.1f}%".format(test_acc * 100))
-        # Plot the results
-        # Make x axis reflect the actual iteration number:
-        # x = [i * record_every for i in list(range(len(val_loss_evolution)))]
-        # plt.plot(x, train_loss_evolution, '-',
-        #          label='Training Loss', color='blue')
-        # plt.plot(x, val_loss_evolution, '-',
-        #          label='Validation Loss', color='darkorange')
-        # plt.legend()
-        # plt.xlabel('Iteration')
-        # plt.ylabel('loss')
-        # plt.show(block=True)
         training_time = datetime.datetime.strptime(
             str(datetime.datetime.now() - starttime), '%H:%M:%S.%f')
         print(training_time.strftime(
