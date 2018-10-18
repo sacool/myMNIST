@@ -12,6 +12,7 @@ Consistently gets 98% accuracy or more on the test set with only a couple minute
 - Loss Function: softmax cross entropy
 - Initializer: Xavier
 - Optimizer: Adam (rate 0.001)
+- Batch Size: 200
 
 
 ## Requirements:
