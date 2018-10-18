@@ -1,6 +1,6 @@
 # MNIST Classifier in TensorFlow
 
-Just a simple neural network MNIST classifier I built to teach myself. Nothing fancy, no convolutional layers or anything. 
+Just a simple neural network MNIST classifier I built to teach myself. Nothing fancy!
 
 Consistently gets 98% accuracy or more on the test set with only a couple minutes of training on my computer.
 
