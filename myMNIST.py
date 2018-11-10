@@ -1,39 +1,11 @@
-# One layer deep neural network. Achieves around 98% accuracy on a testing set.
+# 2 hidden-layer neural network. Achieves around 98% accuracy on a testing set.
 
-# from preprocessed_mnist import load_dataset
-# Keras only used for loading data
-import keras
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
 import datetime
 
 plt.ion()
-
-# Function to load and flatten the image data, one_hot_encode the label data
-
-
-def load_dataset():
-    (X_train, y_train), (X_test, y_test) = keras.datasets.mnist.load_data()
-
-    # normalize x
-    X_train = X_train.astype(float) / 255.
-    X_test = X_test.astype(float) / 255.
-
-    # we reserve the last 10000 training examples for validation
-    X_train, X_val = X_train[:-10000], X_train[-10000:]
-    y_train, y_val = y_train[:-10000], y_train[-10000:]
-
-    X_train = X_train.reshape(
-        X_train.shape[0], X_train.shape[1] * X_train.shape[2])
-    X_val = X_val.reshape(X_val.shape[0], X_val.shape[1] * X_val.shape[2])
-    X_test = X_test.reshape(X_test.shape[0], X_test.shape[1] * X_test.shape[2])
-    with tf.Session() as sess:
-        y_train = tf.one_hot(y_train, 10).eval()
-        y_val = tf.one_hot(y_val, 10).eval()
-        y_test = tf.one_hot(y_test, 10).eval()
-    print('data loaded')
-    return(X_train, y_train, X_val, y_val, X_test, y_test)
 
 
 # Define the model:
@@ -45,7 +17,10 @@ def model_2layer_dropout(n_units_1=512, n_units_2=256, batch_size=200, num_steps
     # Measure and print accuracy 6 times throughout training:
     print_every = (num_steps / 6) // 1
 
-    X_train, y_train, X_val, y_val, X_test, y_test = load_dataset()
+    d = tf.examples.tutorials.mnist.input_data.read_data_sets(
+        './mnist/', one_hot=True)
+    X_train, y_train, X_val, y_val, X_test, y_test = d.train.images, d.train.labels, d.validation.images, d.validation.labels, d.test.images, d.test.labels
+
     # Shapes of the weight vectors
     w1_shape = [X_train.shape[1], n_units_1]
     w2_shape = [n_units_1, n_units_2]
