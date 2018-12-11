@@ -17,7 +17,6 @@ Consistently gets 98% accuracy or more on the test set with only a couple minute
 
 ## Requirements:
 
-- Keras (only used for loading the mnist dataset)
 - TensorFlow (tested with 1.5.0)
 - Numpy
 - Matplotlib (visualizes the losses periodically during training)
