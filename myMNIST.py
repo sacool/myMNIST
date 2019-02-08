@@ -8,31 +8,55 @@ import datetime
 plt.ion()
 
 
+def load_dataset():
+    (X_train, y_train), (X_test, y_test) = tf.keras.datasets.mnist.load_data()
+
+    # normalize x
+    X_train = X_train.astype(float) / 255.
+    X_test = X_test.astype(float) / 255.
+
+    # we reserve the last 10000 training examples for validation
+    X_train, X_val = X_train[:-10000], X_train[-10000:]
+    y_train, y_val = y_train[:-10000], y_train[-10000:]
+
+    X_train = X_train.reshape(
+        X_train.shape[0], X_train.shape[1] * X_train.shape[2])
+    X_val = X_val.reshape(X_val.shape[0], X_val.shape[1] * X_val.shape[2])
+    X_test = X_test.reshape(X_test.shape[0], X_test.shape[1] * X_test.shape[2])
+    with tf.Session():
+        y_train = tf.one_hot(y_train, 10).eval()
+        y_val = tf.one_hot(y_val, 10).eval()
+        y_test = tf.one_hot(y_test, 10).eval()
+    print('data loaded')
+    return(X_train, y_train, X_val, y_val, X_test, y_test)
+
+
 # Define the model:
 
-def model_2layer_dropout(n_units_1=512, n_units_2=256, batch_size=200, num_steps=3300):
+def model_2layer_dropout(n_units_1=512, n_units_2=256,
+                         batch_size=200, num_steps=3300):
     # Set some parameters for how often losses and accuracies are displayed:
     # Measure losses 20 times throughout training
     record_every = (num_steps / 20) // 1
     # Measure and print accuracy 6 times throughout training:
     print_every = (num_steps / 6) // 1
 
-    d = tf.examples.tutorials.mnist.input_data.read_data_sets(
-        './mnist/', one_hot=True)
-    X_train, y_train, X_val, y_val, X_test, y_test = d.train.images, d.train.labels, d.validation.images, d.validation.labels, d.test.images, d.test.labels
+    X_train, y_train, X_val, y_val, X_test, y_test = load_dataset()
 
     # Shapes of the weight vectors
     w1_shape = [X_train.shape[1], n_units_1]
     w2_shape = [n_units_1, n_units_2]
     w3_shape = [n_units_2, 10]
 
-    # Start with Xavier initialized weights (could be random with sigma of 0.01, but this works well too)
+    # Start with Xavier initialized weights
+    # (could be random with sigma of 0.01, but this works well too)
     initializer = tf.contrib.layers.xavier_initializer(dtype=tf.float64)
     # Initialize all variables
     weights_1 = tf.Variable(initializer(w1_shape))
     weights_2 = tf.Variable(initializer(w2_shape))
     weights_3 = tf.Variable(initializer(w3_shape))
-    # Initialize biases at 0: looked in literature, seems to be accepted and work well
+    # Initialize biases at 0: looked in literature,
+    # seems to be accepted and work well
     b_1 = tf.Variable(initial_value=np.zeros((n_units_1)),
                       name='b_1', dtype='float64')
     b_2 = tf.Variable(initial_value=np.zeros((n_units_2)),
@@ -80,7 +104,7 @@ def model_2layer_dropout(n_units_1=512, n_units_2=256, batch_size=200, num_steps
             batch_start = np.random.randint(len(X_train) - batch_size)
             # make the mini batch
             batch_x = X_train[batch_start:(batch_start + batch_size), :]
-            batch_y = y_train[batch_start:(batch_start + batch_size), :]
+            batch_y = y_train[batch_start:(batch_start + batch_size)]
             # Train on the batches that were just created
             sess.run(optimizer, {input_X: batch_x,
                                  input_y: batch_y, keep_prob: 0.2})
@@ -96,9 +120,11 @@ def model_2layer_dropout(n_units_1=512, n_units_2=256, batch_size=200, num_steps
             if step % print_every == 0:
                 print("Training loss at iter {}: {:.4f}".format(step, train_loss_i))
                 print("Validation loss at iter {}, {:.4f}".format(step, val_loss_i))
-                # Calculate and print the training accuracy and validation accuracy:
+                # Calculate and print the training accuracy
+                # and validation accuracy:
                 train_acc = accuracy.eval(
-                    feed_dict={input_X: X_train, input_y: y_train, keep_prob: 1.0})
+                    feed_dict={input_X: X_train, input_y: y_train,
+                               keep_prob: 1.0})
                 val_acc = accuracy.eval(
                     feed_dict={input_X: X_val, input_y: y_val, keep_prob: 1.0})
                 print("Training set accuracy: {:.1f}%".format(train_acc * 100))
